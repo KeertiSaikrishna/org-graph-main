@@ -610,7 +610,6 @@ describe('OrgTree Component', () => {
       await waitFor(() => {
         expect(screen.getByText('John Doe')).toBeInTheDocument()
         expect(screen.getByText('CEO')).toBeInTheDocument()
-        // Look for a <span> with class "employee-list-item-team" and text "Executive"
         const teamSpans = screen.getAllByText('Executive');
         expect(
           teamSpans.some(
@@ -857,7 +856,8 @@ describe('OrgTree Component', () => {
 
       render(<OrgTree />)
       await waitFor(() => {
-        expect(screen.getByText('John')).toBeInTheDocument()
+        const johnDoeSpans = screen.getAllByText('John');
+        expect(johnDoeSpans.length).toBe(2);
       })
     })
   })
@@ -878,8 +878,11 @@ describe('OrgTree Component', () => {
       await waitFor(() => {
         expect(mockAxiosGet).toHaveBeenCalledWith('/api/employees')
         expect(mockCalculateLayout).toHaveBeenCalled()
-        expect(screen.getByText('John Doe')).toBeInTheDocument()
-        expect(screen.getByText('Jane Smith')).toBeInTheDocument()
+
+        const johnDoeSpans = screen.getAllByText('John Doe');
+        const janeSmithSpans = screen.getAllByText('Jane Smith');
+        expect(johnDoeSpans.length).toBe(2);
+        expect(janeSmithSpans.length).toBe(2);
       })
     })
   })

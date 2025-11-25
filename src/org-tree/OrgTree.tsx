@@ -45,12 +45,10 @@ export default function OrgTree() {
   useEffect(() => {
     const calculateLayout = async () => {
       const graph = await calculateOrgChartLayout(employees, filteredEmployees);
-      if (graph) {
-        setLayout(graph);
-      }
+      setLayout(graph);
     };
-
-    if (filteredEmployees.length > 0) {
+    
+    if (employees.length !== 0) {
       calculateLayout();
     }
   }, [filteredEmployees, employees]);
