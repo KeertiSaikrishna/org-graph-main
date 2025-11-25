@@ -93,7 +93,7 @@ export function makeServer() {
         return new Promise((resolve) => {
           setTimeout(() => {
             resolve(schema.all('employee'));
-          }, 2000);
+          }, 1000);
         });
       });
 

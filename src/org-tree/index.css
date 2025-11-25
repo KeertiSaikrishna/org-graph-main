@@ -134,6 +134,12 @@
   box-shadow: 0 6px 16px rgba(16,185,129,0.4);
 }
 
+.employee-card.invalid-drop-target {
+  border-color: #ef4444;
+  background: #2e1a1a;
+  box-shadow: 0 6px 16px rgba(239,68,68,0.4);
+}
+
 .employee-avatar {
   width: 56px;
   height: 56px;

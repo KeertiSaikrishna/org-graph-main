@@ -1,5 +1,5 @@
 import ELK from 'elkjs/lib/elk.bundled.js';
-import { Employee } from '../services/types';
+import { Employee } from '../../services/types';
 
 export interface ELKNode {
     id: string;
@@ -70,7 +70,7 @@ export async function calculateOrgChartLayout(
     }));
 
     const edges = displayEmployees
-        .filter(emp => emp.managerId && nodesToShow.has(emp.managerId))
+        .filter(emp => emp.managerId && nodesToShow.has(emp.managerId) && nodesToShow.has(emp.id))
         .map(emp => ({
             id: `edge-${emp.managerId}-${emp.id}`,
             sources: [emp.managerId],
@@ -81,10 +81,10 @@ export async function calculateOrgChartLayout(
         const graph = await elk.layout({
             id: 'root',
             layoutOptions: {
-                'elk.algorithm': layoutOptions.algorithm!,
-                'elk.direction': layoutOptions.direction!,
-                'elk.spacing.nodeNode': layoutOptions.spacing!,
-                'elk.layered.spacing.nodeNodeBetweenLayers': layoutOptions.layerSpacing!,
+                'elk.algorithm': layoutOptions.algorithm as string,
+                'elk.direction': layoutOptions.direction as string,
+                'elk.spacing.nodeNode': layoutOptions.spacing as string,
+                'elk.layered.spacing.nodeNodeBetweenLayers': layoutOptions.layerSpacing as string,
             },
             children: nodes,
             edges: edges,

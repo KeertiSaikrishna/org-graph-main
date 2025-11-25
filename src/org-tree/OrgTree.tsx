@@ -8,7 +8,7 @@ import {
   DragOverlay,
 } from "@dnd-kit/core";
 import { EmployeeNode } from "./components/EmployeeNode";
-import { ELKLayout, calculateOrgChartLayout } from "./elkUtils";
+import { ELKLayout, calculateOrgChartLayout } from "./utils/elkUtils";
 import { notification, Select, Skeleton } from "antd";
 import axios from "axios";
 
@@ -100,6 +100,13 @@ export default function OrgTree() {
     }
   }, [employees]);
 
+  const isSubordinate = useCallback((empId: string, potentialSubId: string) => {
+    const emp = employees.find((e) => e.id === potentialSubId);
+    if (!emp || !emp.managerId) return false;
+    if (emp.managerId === empId) return true;
+    return isSubordinate(empId, emp.managerId);
+  }, [employees]);
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setOverNodeId(null);
@@ -112,17 +119,10 @@ export default function OrgTree() {
 
     if (draggedId === newManagerId) return;
 
-    const isSubordinate = (empId: string, potentialSubId: string) => {
-      const emp = employees.find((e) => e.id === potentialSubId);
-      if (!emp || !emp.managerId) return false;
-      if (emp.managerId === empId) return true;
-      return isSubordinate(empId, emp.managerId);
-    };
-
     if (isSubordinate(draggedId, newManagerId)) {
       notification.info({
         title: "Cannot assign a subordinate as manager!",
-        duration: 500,
+        duration: 1,
       });
       return;
     }
@@ -133,8 +133,6 @@ export default function OrgTree() {
       )
     );
     updateEmployeeManager(draggedId, newManagerId);
-
-    console.log(`Updated: ${draggedId} now reports to ${newManagerId}`);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -144,6 +142,11 @@ export default function OrgTree() {
       setOverNodeId(null);
     }
   };
+
+  const isInvalidDrop = useCallback((draggedId: string, targetId: string) => {
+    if (!draggedId || !targetId || draggedId === targetId) return false;
+    return isSubordinate(draggedId, targetId);
+  }, [isSubordinate]);
 
   const layoutDimensions = useMemo(() => {
     if (!layout) return null;
@@ -295,12 +298,16 @@ export default function OrgTree() {
                 if (!employee || node.x === undefined || node.y === undefined)
                   return null;
 
+                const isOver = overNodeId === employee.id;
+                const isInvalid = activeId ? isInvalidDrop(activeId, employee.id) : false;
+
                 return (
                   <EmployeeNode
                     key={employee.id}
                     employee={employee}
                     position={{ x: node.x, y: node.y }}
-                    isOver={overNodeId === employee.id}
+                    isOver={isOver && !isInvalid}
+                    isInvalidDrop={isInvalid}
                   />
                 );
               })}
